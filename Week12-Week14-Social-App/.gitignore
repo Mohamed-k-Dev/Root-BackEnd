@@ -1,0 +1,5 @@
+/node_modules
+/src/Config/.env.dev
+/Features.md
+/prompt.md
+/arch.md
