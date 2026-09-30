@@ -13,7 +13,8 @@ export const errorResponse = ({
   status = 500,
   error = undefined,
   stack = undefined,
-}) => { 
+}) => {
+  if (res.headersSent) return;
   return res.status(status).json({
     success: false,
     message,
@@ -21,4 +22,3 @@ export const errorResponse = ({
     stack,
   });
 };
- 

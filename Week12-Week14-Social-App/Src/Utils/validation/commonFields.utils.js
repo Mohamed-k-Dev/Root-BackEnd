@@ -1,6 +1,18 @@
 import Joi from "joi";
+import mongoose from "mongoose";
+
+const isValidObjectId = (value, helpers) => {
+  if (!mongoose.Types.ObjectId.isValid(value)) {
+    return helpers.error("any.invalid");
+  }
+  return value;
+};
 
 export const UserCommonFields = {
+  id: Joi.custom(isValidObjectId).messages({
+    "any.required": "ID is required",
+    "any.invalid": "Invalid ID",
+  }),
   userName: Joi.string().trim().min(3).max(30).messages({
     "string.min": "User name must be at least 3 characters long",
     "string.max": "User name must be at most 30 characters long",
@@ -23,7 +35,6 @@ export const UserCommonFields = {
       "string.base": "Email must be a string",
     }),
   password: Joi.string()
-    .required()
     .min(8)
     .max(100)
     .regex(
@@ -37,12 +48,14 @@ export const UserCommonFields = {
       "string.base": "Password must be a string",
       "string.pattern.base":
         "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character",
+      "any.invalid": "New password can not be same as old password",
     }),
-  confirmPassword: Joi.string().required().valid(Joi.ref("password")).messages({
+  confirmPassword: Joi.string().valid(Joi.ref("password")).messages({
     "any.only": "Password and confirm password must match",
     "any.required": "Confirm password is required",
     "string.empty": "Confirm password is required",
     "string.base": "Confirm password must be a string",
+    "any.invalid": "New password can not be same as old password",
   }),
   gender: Joi.string().valid("male", "female").default("male").messages({
     "any.only": "Gender must be 'male' or 'female'",
@@ -102,4 +115,3 @@ export const AuthCommonFields = {
     "string.base": "ID token must be a string",
   }),
 };
-

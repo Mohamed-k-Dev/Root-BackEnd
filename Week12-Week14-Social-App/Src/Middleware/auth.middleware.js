@@ -26,7 +26,7 @@ export const authenticationMiddleware = errorHandler(async (req, res, next) => {
   const decoded = await verifyAccessToken(accessToken, res);
   const isAccessTokenBlacklisted = await isTokenBlacklisted(decoded.jti);
   if (isAccessTokenBlacklisted) {
-    errorResponse({
+   return errorResponse({
       res,
       message: "Access token is blacklisted",
       status: 401,
@@ -35,7 +35,7 @@ export const authenticationMiddleware = errorHandler(async (req, res, next) => {
 
   const user = await User.findById(decoded.id, excludedFields);
   if (!user) {
-    errorResponse({
+    return  errorResponse({
       res,
       message: "User not found",
       status: 404,

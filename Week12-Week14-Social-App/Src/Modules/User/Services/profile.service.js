@@ -9,6 +9,7 @@ import uploadImage, {
   deleteMultipleUploadedImages,
   deleteUploadedImage,
 } from "../../../Service/cloudinary.service.js";
+import Viewers from "../../../DB/Models/viewers.model.js";
 
 export const listUsers = async (req, res) => {
   const users = await User.find({});
@@ -21,15 +22,7 @@ export const getProfile = async (req, res, next) => {
 };
 
 export const updatePassword = async (req, res, next) => {
-  const { oldPassword, newPassword, confirmPassword } = req.body;
-
-  if (newPassword !== confirmPassword) {
-    return errorResponse({
-      res,
-      message: "Password doesn't match",
-      status: 400,
-    });
-  }
+  const { oldPassword, password } = req.body;
   const user = await User.findById(req.authUser._id);
 
   const isPasswordMatch = compareSync(oldPassword, user.password);
@@ -41,7 +34,7 @@ export const updatePassword = async (req, res, next) => {
     });
   }
 
-  const hashedPassword = hashSync(newPassword, +process.env.SALT);
+  const hashedPassword = hashSync(password, +process.env.SALT);
   user.password = hashedPassword;
   await user.save();
 
@@ -136,5 +129,29 @@ export const uploadProfileImages = async (req, res) => {
     res,
     message: "Cover images uploaded successfully",
     data: { user: updatedUser },
+  });
+};
+
+export const viewProfile = async (req, res) => {
+  const { id } = req.params;
+  const user = await User.findById(id);
+  if (!user) {
+    return errorResponse({
+      res,
+      message: "User not found",
+      status: 404,
+    });
+  }
+
+  if (user._id.toString() !== req.authUser._id.toString()) {
+    await Viewers.create({
+      viewer: req.authUser._id,
+      viewed: user._id,
+    });
+  }
+
+  sendSuccessResponse({
+    res,
+    message: "Profile fetched successfully",
   });
 };
