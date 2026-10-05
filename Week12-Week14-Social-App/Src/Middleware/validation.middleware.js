@@ -7,7 +7,7 @@ export const validationMiddleware = (schema = {}) => {
 
     for (const key of arrOfSchemas) {
       const { error } = schema[key]?.validate(req[key], { abortEarly: false });
-      validationErrors.push(...(error?.details || []));
+      if (error) validationErrors.push(...error.details);
     }
 
     if (validationErrors?.length > 0) {

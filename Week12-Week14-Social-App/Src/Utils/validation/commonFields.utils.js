@@ -8,6 +8,24 @@ const isValidObjectId = (value, helpers) => {
   return value;
 };
 
+export const paginationCommonFields = {
+  page: Joi.number().integer().min(1).default(1).messages({
+    "number.base": "Page must be a number",
+    "number.min": "Page must be at least 1",
+    "number.integer": "Page must be an integer",
+  }),
+  limit: Joi.number().integer().min(1).max(100).default(10).messages({
+    "number.base": "Limit must be a number",
+    "number.min": "Limit must be at least 1",
+    "number.max": "Limit must be at most 100",
+    "number.integer": "Limit must be an integer",
+  }),
+  sort: Joi.string().valid("asc", "desc").default("desc").messages({
+    "string.base": "Sort must be a string",
+    "string.valid": "Sort must be either 'asc' or 'desc'",
+  }),
+};
+
 export const UserCommonFields = {
   id: Joi.custom(isValidObjectId).messages({
     "any.required": "ID is required",
@@ -114,4 +132,85 @@ export const AuthCommonFields = {
     "string.empty": "ID token is required",
     "string.base": "ID token must be a string",
   }),
+};
+
+export const PostCommonFields = {
+  postId: Joi.custom(isValidObjectId).required().messages({
+    "any.required": "Post id is required",
+    "string.empty": "Post id is required",
+    "string.base": "Post id must be a string",
+    "any.invalid": "Invalid Post id",
+    "any.required": "Post id is required",
+  }),
+  content: Joi.string().trim().min(2).max(5000).messages({
+    "string.base": "Content must be a string",
+    "string.min": "Content must be at least {#limit} characters long",
+    "string.max": "Content must be at most {#limit} characters long",
+    "string.empty": "Content cannot be empty",
+  }),
+  tags: Joi.array()
+    .items(Joi.string().trim().lowercase().min(2).max(30))
+    .min(1)
+    .max(10)
+    .unique()
+    .messages({
+      "array.base": "Tags must be an array",
+      "array.min": "You must add at least 1 tag",
+      "array.max": "You can add at most 10 tags",
+      "array.unique": "Tags must be unique",
+      "string.min": "Each tag must be at least 2 character long",
+      "string.max": "Each tag must be at most 30 characters long",
+      "string.empty": "Tags cannot be empty",
+    }),
+  images: Joi.array()
+    .items(
+      Joi.object({
+        originalname: Joi.string().required().messages({
+          "string.base": "Original name must be a string",
+          "any.required": "Original name is required",
+        }),
+        encoding: Joi.string()
+          .valid("7bit", "8bit", "base64", "binary", "hex")
+          .required()
+          .messages({
+            "string.base": "Encoding must be a string",
+            "string.valid":
+              "Encoding must be one of '7bit', '8bit', 'base64', 'binary', 'hex'",
+            "any.required": "Encoding is required",
+          }),
+        path: Joi.string().required().messages({
+          "string.base": "Path must be a string",
+          "any.required": "Path is required",
+        }),
+        destination: Joi.string().required().messages({
+          "string.base": "Destination must be a string",
+          "any.required": "Destination is required",
+        }),
+        filename: Joi.string().required().messages({
+          "string.base": "Filename must be a string",
+          "any.required": "Filename is required",
+        }),
+        size: Joi.number().required().messages({
+          "number.base": "Size must be a number",
+          "any.required": "Size is required",
+        }),
+        mimetype: Joi.string().required().messages({
+          "string.base": "Mimetype must be a string",
+          "any.required": "Mimetype is required",
+        }),
+        fieldname: Joi.string().required().messages({
+          "string.base": "Fieldname must be a string",
+          "any.required": "Fieldname is required",
+        }),
+      })
+    )
+    .max(5),
+
+  status: Joi.string()
+    .valid("active", "deleted", "all")
+    .default("active")
+    .messages({
+      "any.only": "Status must be 'active', 'deleted', or 'all'",
+      "string.base": "Status must be a string",
+    }),
 };
