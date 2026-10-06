@@ -1,5 +1,9 @@
 import Joi from "joi";
 import mongoose from "mongoose";
+import {
+  REACTION_TARGET_TYPES,
+  REACTION_TYPES,
+} from "../../Constants/Constants.js";
 
 const isValidObjectId = (value, helpers) => {
   if (!mongoose.Types.ObjectId.isValid(value)) {
@@ -212,5 +216,36 @@ export const PostCommonFields = {
     .messages({
       "any.only": "Status must be 'active', 'deleted', or 'all'",
       "string.base": "Status must be a string",
+    }),
+};
+
+export const ReactionCommonFields = {
+  targetType: Joi.string()
+    .valid(...Object.values(REACTION_TARGET_TYPES))
+    .required()
+    .messages({
+      "any.only": `Target type must be one of ${Object.values(
+        REACTION_TARGET_TYPES
+      ).join(", ")}`,
+      "any.required": "Target type is required",
+      "string.empty": "Target type is required",
+      "string.base": "Target type must be a string",
+    }),
+  targetId: Joi.custom(isValidObjectId).required().messages({
+    "any.required": "Target id is required",
+    "string.empty": "Target id is required",
+    "string.base": "Target id must be a string",
+    "any.invalid": "Invalid Target id",
+  }),
+  reaction: Joi.string()
+    .valid(...Object.values(REACTION_TYPES))
+    .required()
+    .messages({
+      "any.only": `Reaction must be one of  ${Object.values(
+        REACTION_TYPES
+      ).join(", ")}`,
+      "any.required": "Reaction is required",
+      "string.empty": "Reaction is required",
+      "string.base": "Reaction must be a string",
     }),
 };

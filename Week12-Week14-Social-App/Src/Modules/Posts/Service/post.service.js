@@ -1,7 +1,6 @@
 import { SYSTEM_RULES } from "../../../Constants/Constants.js";
 import {
   create,
-  find,
   findById,
   findOneAndDelete,
   findOneAndUpdate,
@@ -12,6 +11,7 @@ import User from "../../../DB/Models/User.model.js";
 import uploadImage, {
   deleteUploadedImage,
 } from "../../../Service/cloudinary.service.js";
+import { attachReactionsToPosts } from "../../../Utils/post/attachReactionsToPosts.utils.js";
 import {
   errorResponse,
   sendSuccessResponse,
@@ -19,30 +19,35 @@ import {
 
 export const getAllPosts = async (req, res) => {
   const { page, limit, status, sort } = req.query;
+
   const filter =
     status === "deleted"
       ? { isDeleted: true }
       : status === "active"
-      ? { isDeleted: false, isDeleted: null }
+      ? { isDeleted: { $ne: true } }
       : {};
+
   const sortOption = sort === "asc" ? { createdAt: 1 } : { createdAt: -1 };
 
-  const post = await paginate({
+  const result = await paginate({
     model: Post,
-    filter: { ...filter },
-    projection: "-author -__v -createdAt -updatedAt -deletedAt",
-    populate: {
-      path: "author",
-      select: "userName email profileImage",
-    },
+    filter,
+    projection: "-__v -updatedAt -deletedAt",
+    populate: [{ path: "author", select: "userName email profileImage" }],
     page,
     limit,
     sort: sortOption,
   });
+
+  const posts = await attachReactionsToPosts({
+    posts: result.data,
+    userId: req.authUser._id,
+  });
+
   sendSuccessResponse({
     res,
-    message: "Post fetched successfully",
-    data: { post },
+    message: "Posts fetched successfully",
+    data: { posts, pagination: result.pagination },
   });
 };
 

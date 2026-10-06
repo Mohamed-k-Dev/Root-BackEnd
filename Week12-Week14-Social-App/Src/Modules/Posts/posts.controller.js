@@ -36,7 +36,7 @@ postsRouter.get(
   "/all",
   validationMiddleware(getPostsSchema),
   authenticationMiddleware,
-  authorizationMiddleware([SYSTEM_RULES.ADMIN]),
+  // authorizationMiddleware([SYSTEM_RULES.ADMIN]),
   errorHandler(getAllPosts)
 );
 

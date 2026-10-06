@@ -3,6 +3,7 @@ import { globalErrorHandler } from "../../Middleware/errorHandler.middleware.js"
 import { authRouter } from "../../Modules/Auth/auth.controller.js";
 import { userRouter } from "../../Modules/User/profile.controller.js";
 import { postsRouter } from "../../Modules/Posts/posts.controller.js";
+import { reactionRouter } from "../../Modules/Reactions/reaction.cotnroller.js";
 
 const allowedOrigins = process.env.ORIGIN_WHITE_LIST || [];
 const corsOptions = {
@@ -32,5 +33,6 @@ export default function routerHandler(app, express) {
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/post", postsRouter);
+  app.use("/api/v1/react", reactionRouter);
   app.use(globalErrorHandler);
 }

@@ -45,5 +45,14 @@ export const PostModel = new mongoose.Schema(
   { timestamps: true }
 );
 
+PostModel.virtual("reactions", {
+  ref: "Reaction",
+  localField: "_id",
+  foreignField: "targetId",
+});
+
+PostModel.set("toJSON", { virtuals: true });
+PostModel.set("toObject", { virtuals: true });
+
 const Post = mongoose.models.Post || mongoose.model("Post", PostModel);
 export default Post;
