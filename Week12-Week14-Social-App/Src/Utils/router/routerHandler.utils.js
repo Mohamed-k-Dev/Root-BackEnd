@@ -4,6 +4,7 @@ import { authRouter } from "../../Modules/Auth/auth.controller.js";
 import { userRouter } from "../../Modules/User/profile.controller.js";
 import { postsRouter } from "../../Modules/Posts/posts.controller.js";
 import { reactionRouter } from "../../Modules/Reactions/reaction.cotnroller.js";
+import { commentsRouter } from "../../Modules/Comments/comments.controller.js";
 
 const allowedOrigins = process.env.ORIGIN_WHITE_LIST || [];
 const corsOptions = {
@@ -34,5 +35,6 @@ export default function routerHandler(app, express) {
   app.use("/api/v1/user", userRouter);
   app.use("/api/v1/post", postsRouter);
   app.use("/api/v1/react", reactionRouter);
+  app.use("/api/v1/comment", commentsRouter);
   app.use(globalErrorHandler);
 }

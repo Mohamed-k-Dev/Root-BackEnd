@@ -11,13 +11,13 @@ const excludedFields = {
   __v: 0,
   createdAt: 0,
   updatedAt: 0,
-  isVerified: 0,
   otp: 0,
   otpExpiration: 0,
   forgetOtp: 0,
   forgetOtpExpiration: 0,
-  isBlocked: 0,
-  isDeleted: 0,
+  // isVerified: 0,
+  // isBlocked: 0,
+  // isDeleted: 0,
 };
 
 export const authenticationMiddleware = errorHandler(async (req, res, next) => {
@@ -26,7 +26,7 @@ export const authenticationMiddleware = errorHandler(async (req, res, next) => {
   const decoded = await verifyAccessToken(accessToken, res);
   const isAccessTokenBlacklisted = await isTokenBlacklisted(decoded.jti);
   if (isAccessTokenBlacklisted) {
-   return errorResponse({
+    return errorResponse({
       res,
       message: "Access token is blacklisted",
       status: 401,
@@ -35,10 +35,19 @@ export const authenticationMiddleware = errorHandler(async (req, res, next) => {
 
   const user = await User.findById(decoded.id, excludedFields);
   if (!user) {
-    return  errorResponse({
+    return errorResponse({
       res,
       message: "User not found",
       status: 404,
+    });
+  }
+  const isValidUser = user.isDeleted || user.isBlocked || !user.isVerified;
+
+  if (isValidUser) {
+    return errorResponse({
+      res,
+      message: "User may be deleted, blocked or not verified",
+      status: 401,
     });
   }
 

@@ -117,6 +117,22 @@ export const findOneAndUpdate = async ({
     .populate(populate);
 };
 
+export const updateCounter = async ({
+  model,
+  id,
+  field,
+  amount = 1,
+  session,
+}) => {
+  const filter = { _id: id };
+  if (amount < 0) filter[field] = { $gte: Math.abs(amount) };
+  return model.findOneAndUpdate(
+    filter,
+    { $inc: { [field]: amount } },
+    { new: true, session }
+  );
+};
+
 export const findByIdAndUpdate = async ({
   model,
   id,

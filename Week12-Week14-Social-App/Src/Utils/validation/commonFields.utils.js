@@ -1,6 +1,7 @@
 import Joi from "joi";
 import mongoose from "mongoose";
 import {
+  COMMENT_TARGET_TYPES,
   REACTION_TARGET_TYPES,
   REACTION_TYPES,
 } from "../../Constants/Constants.js";
@@ -248,4 +249,35 @@ export const ReactionCommonFields = {
       "string.empty": "Reaction is required",
       "string.base": "Reaction must be a string",
     }),
+};
+
+export const commentCommonFields = {
+  targetType: Joi.string()
+    .required()
+    .valid(...Object.values(COMMENT_TARGET_TYPES))
+    .messages({
+      "any.only": `Target type must be one of ${Object.values(
+        COMMENT_TARGET_TYPES
+      ).join(", ")}`,
+      "any.required": "Target type is required",
+      "string.empty": "Target type is required",
+      "string.base": "Target type must be a string",
+    }),
+  targetId: Joi.custom(isValidObjectId).required().messages({
+    "any.required": "Target id is required",
+    "string.empty": "Target id is required",
+    "string.base": "Target id must be a string",
+    "any.invalid": "Invalid Target id",
+  }),
+  content: Joi.string().min(1).max(1000).required().messages({
+    "any.required": "Content is required",
+    "string.empty": "Content is required",
+    "string.base": "Content must be a string",
+    "string.min": "Content must be at least 1 character long",
+    "string.max": "Content must be at most 1000 characters long",
+  }),
+  parentComment: Joi.custom(isValidObjectId).messages({
+    "any.invalid": "Invalid Parent comment id",
+    "string.base": "Parent comment id must be a string",
+  }),
 };

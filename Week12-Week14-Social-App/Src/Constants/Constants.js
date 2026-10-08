@@ -26,5 +26,10 @@ export const REACTION_TARGET_TYPES = {
   MESSAGE: "Message",
 };
 
+export const COMMENT_TARGET_TYPES = {
+  POST: "Post",
+  COMMENT: "Comment",
+};
+
 export const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/jpg"];
 export const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2MB

@@ -6,7 +6,10 @@ export const validationMiddleware = (schema = {}) => {
     const validationErrors = [];
 
     for (const key of arrOfSchemas) {
-      const { error } = schema[key]?.validate(req[key], { abortEarly: false });
+      const { error } = schema[key]?.validate(req[key] || {} , {
+        abortEarly: false,
+      });
+
       if (error) validationErrors.push(...error.details);
     }
 
@@ -20,6 +23,7 @@ export const validationMiddleware = (schema = {}) => {
         }),
       });
     }
+
     next();
   };
 };
