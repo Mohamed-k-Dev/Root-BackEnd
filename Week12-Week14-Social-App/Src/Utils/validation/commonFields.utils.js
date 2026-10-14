@@ -13,6 +13,47 @@ const isValidObjectId = (value, helpers) => {
   return value;
 };
 
+const imageCommonField = {
+  originalname: Joi.string().required().messages({
+    "string.base": "Original name must be a string",
+    "any.required": "Original name is required",
+  }),
+  encoding: Joi.string()
+    .valid("7bit", "8bit", "base64", "binary", "hex")
+    .required()
+    .messages({
+      "string.base": "Encoding must be a string",
+      "string.valid":
+        "Encoding must be one of '7bit', '8bit', 'base64', 'binary', 'hex'",
+      "any.required": "Encoding is required",
+    }),
+  path: Joi.string().required().messages({
+    "string.base": "Path must be a string",
+    "any.required": "Path is required",
+  }),
+  destination: Joi.string().required().messages({
+    "string.base": "Destination must be a string",
+    "any.required": "Destination is required",
+  }),
+  filename: Joi.string().required().messages({
+    "string.base": "Filename must be a string",
+    "any.required": "Filename is required",
+  }),
+  size: Joi.number().required().messages({
+    "number.base": "Size must be a number",
+    "any.required": "Size is required",
+    "number.max": "Size must be at most 50 MB",
+  }),
+  mimetype: Joi.string().required().messages({
+    "string.base": "Mimetype must be a string",
+    "any.required": "Mimetype is required",
+  }),
+  fieldname: Joi.string().required().messages({
+    "string.base": "Fieldname must be a string",
+    "any.required": "Fieldname is required",
+  }),
+};
+
 export const paginationCommonFields = {
   page: Joi.number().integer().min(1).default(1).messages({
     "number.base": "Page must be a number",
@@ -167,50 +208,7 @@ export const PostCommonFields = {
       "string.max": "Each tag must be at most 30 characters long",
       "string.empty": "Tags cannot be empty",
     }),
-  images: Joi.array()
-    .items(
-      Joi.object({
-        originalname: Joi.string().required().messages({
-          "string.base": "Original name must be a string",
-          "any.required": "Original name is required",
-        }),
-        encoding: Joi.string()
-          .valid("7bit", "8bit", "base64", "binary", "hex")
-          .required()
-          .messages({
-            "string.base": "Encoding must be a string",
-            "string.valid":
-              "Encoding must be one of '7bit', '8bit', 'base64', 'binary', 'hex'",
-            "any.required": "Encoding is required",
-          }),
-        path: Joi.string().required().messages({
-          "string.base": "Path must be a string",
-          "any.required": "Path is required",
-        }),
-        destination: Joi.string().required().messages({
-          "string.base": "Destination must be a string",
-          "any.required": "Destination is required",
-        }),
-        filename: Joi.string().required().messages({
-          "string.base": "Filename must be a string",
-          "any.required": "Filename is required",
-        }),
-        size: Joi.number().required().messages({
-          "number.base": "Size must be a number",
-          "any.required": "Size is required",
-        }),
-        mimetype: Joi.string().required().messages({
-          "string.base": "Mimetype must be a string",
-          "any.required": "Mimetype is required",
-        }),
-        fieldname: Joi.string().required().messages({
-          "string.base": "Fieldname must be a string",
-          "any.required": "Fieldname is required",
-        }),
-      })
-    )
-    .max(5),
-
+  images: Joi.array().items(Joi.object(imageCommonField)).max(5),
   status: Joi.string()
     .valid("active", "deleted", "all")
     .default("active")
@@ -269,15 +267,26 @@ export const commentCommonFields = {
     "string.base": "Target id must be a string",
     "any.invalid": "Invalid Target id",
   }),
-  content: Joi.string().min(1).max(1000).required().messages({
+  content: Joi.string().min(1).max(1000).messages({
     "any.required": "Content is required",
     "string.empty": "Content is required",
     "string.base": "Content must be a string",
     "string.min": "Content must be at least 1 character long",
     "string.max": "Content must be at most 1000 characters long",
   }),
-  parentComment: Joi.custom(isValidObjectId).messages({
-    "any.invalid": "Invalid Parent comment id",
-    "string.base": "Parent comment id must be a string",
-  }),
+  tags: Joi.array()
+    .items(Joi.string().trim().lowercase().min(2).max(30))
+    .min(1)
+    .max(10)
+    .unique()
+    .messages({
+      "array.base": "Tags must be an array",
+      "array.min": "You must add at least 1 tag",
+      "array.max": "You can add at most 10 tags",
+      "array.unique": "Tags must be unique",
+      "string.min": "Each tag must be at least 2 character long",
+      "string.max": "Each tag must be at most 30 characters long",
+      "string.empty": "Tags cannot be empty",
+    }),
+  image: Joi.object(imageCommonField),
 };

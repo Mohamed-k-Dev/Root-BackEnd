@@ -1,5 +1,9 @@
 import Joi from "joi";
-import { commentCommonFields, paginationCommonFields } from "../Utils/validation/commonFields.utils.js";
+import {
+  commentCommonFields,
+  paginationCommonFields,
+  PostCommonFields,
+} from "../Utils/validation/commonFields.utils.js";
 
 export const createCommentSchema = {
   params: Joi.object({
@@ -8,8 +12,20 @@ export const createCommentSchema = {
   body: Joi.object({
     content: commentCommonFields.content,
     targetType: commentCommonFields.targetType,
-    parentComment: commentCommonFields.parentComment,
+    tags: PostCommonFields.tags,
   }),
+  file: commentCommonFields.image,
+};
+
+export const updateCommentSchema = {
+  params: Joi.object({
+    commentId: commentCommonFields.targetId,
+  }),
+  body: Joi.object({
+    content: commentCommonFields.content,
+    tags: PostCommonFields.tags,
+  }),
+  file: commentCommonFields.image,
 };
 
 export const getCommentsSchema = {

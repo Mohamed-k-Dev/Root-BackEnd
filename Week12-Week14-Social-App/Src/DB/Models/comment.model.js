@@ -13,8 +13,9 @@ export const commentSchema = new mongoose.Schema(
       trim: true,
       minlength: [1, "Comment content must be at least 1 character long"],
       maxlength: [1000, "Comment content must be at most 1000 characters"],
-      required: [true, "Comment content is required"],
     },
+    image: { url: String, public_id: String },
+    tags: [{ type: String, trim: true, lowercase: true }],
     targetType: {
       type: String,
       enum: Object.values(COMMENT_TARGET_TYPES),
@@ -38,7 +39,7 @@ commentSchema.index({
   targetId: 1,
   createdAt: -1,
 });
-commentSchema.index({ post: 1, targetType: 1, createdAt: -1 });    
+commentSchema.index({ post: 1, targetType: 1, createdAt: -1 });
 commentSchema.index({ ancestors: 1 });
 
 const Comment =

@@ -28,7 +28,7 @@ import {
   getPostsSchema,
   updatePostSchema,
 } from "../../validators/post.schema.js";
-import { preparePostPayload } from "../../Middleware/post.middleware.js";
+import { preparePayload } from "../../Middleware/prepare.middleware.js";
 
 export const postsRouter = Router();
 
@@ -56,7 +56,7 @@ postsRouter.post(
   "/create",
   authenticationMiddleware,
   Multer(ALLOWED_IMAGE_TYPES).fields([{ name: "images", maxCount: 5 }]),
-  preparePostPayload,
+  preparePayload,
   validationMiddleware(createPostSchema),
   errorHandler(createPost)
 );
@@ -65,7 +65,7 @@ postsRouter.patch(
   "/update/post/:postId",
   authenticationMiddleware,
   Multer(ALLOWED_IMAGE_TYPES).fields([{ name: "images", maxCount: 5 }]),
-  preparePostPayload,
+  preparePayload,
   validationMiddleware(updatePostSchema),
   errorHandler(updatePost)
 );

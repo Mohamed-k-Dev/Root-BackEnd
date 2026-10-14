@@ -4,12 +4,16 @@ import {
   deleteMany,
   find,
   findById,
+  findByIdAndUpdate,
   findOne,
   paginate,
   updateCounter,
 } from "../../../DB/dbServices.js";
 import Comment from "../../../DB/Models/comment.model.js";
 import Post from "../../../DB/Models/Post.model.js";
+import uploadImage, {
+  deleteUploadedImage,
+} from "../../../Service/cloudinary.service.js";
 import {
   errorResponse,
   sendSuccessResponse,
@@ -21,6 +25,7 @@ export const CreateComment = async (req, res) => {
   const author = req.authUser;
   const { content, targetType } = req.body;
   const { targetId } = req.params;
+  const image = req.file;
 
   const target = await findOne({
     model: targetModels[targetType],
@@ -38,6 +43,18 @@ export const CreateComment = async (req, res) => {
   const postId = isReply ? target.post : target._id;
   const ancestors = isReply ? [...(target.ancestors || []), target._id] : [];
 
+  const commentImage = {};
+  if (image) {
+    const { url, public_id } = await uploadImage({
+      filePath: image?.path,
+      options: {
+        folder: process.env.CLOUDINARY_COMMENT_FOLDER,
+      },
+    });
+    commentImage.url = url;
+    commentImage.public_id = public_id;
+  }
+
   const comment = await create({
     model: Comment,
     data: {
@@ -47,6 +64,7 @@ export const CreateComment = async (req, res) => {
       targetId,
       post: postId,
       ancestors,
+      image: image ? commentImage : undefined,
     },
   });
 
@@ -60,6 +78,65 @@ export const CreateComment = async (req, res) => {
     res,
     message: "Comment created successfully",
     status: 201,
+    data: comment,
+  });
+};
+
+export const UpdateComment = async (req, res) => {
+  const author = req.authUser;
+  const { content, tags } = req.body;
+  const { commentId } = req.params;
+  const image = req.file;
+
+  const target = await findOne({
+    model: Comment,
+    filter: { _id: commentId },
+  });
+  if (!target || target.isDeleted) {
+    return errorResponse({
+      res,
+      message: `No comment found with this id belong to you`,
+      status: 404,
+    });
+  }
+
+  if (target.author.toString() !== author._id.toString()) {
+    return errorResponse({
+      res,
+      message: "You are not authorized to update this comment",
+      status: 403,
+    });
+  }
+
+  const commentImage = {};
+  if (image) {
+    if (target?.image?.public_id) {
+      await deleteUploadedImage(target?.image?.public_id);
+    }
+    const { url, public_id } = await uploadImage({
+      filePath: image?.path,
+      options: {
+        folder: process.env.CLOUDINARY_COMMENT_FOLDER,
+      },
+    });
+    commentImage.url = url;
+    commentImage.public_id = public_id;
+  }
+
+  const comment = await findByIdAndUpdate({
+    model: Comment,
+    data: {
+      content,
+      tags,
+      image: image ? commentImage : undefined,
+    },
+    id: commentId,
+  });
+
+  sendSuccessResponse({
+    res,
+    message: "Comment updated successfully",
+    status: 200,
     data: comment,
   });
 };
