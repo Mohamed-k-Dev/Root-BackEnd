@@ -1,11 +1,12 @@
 import cors from "cors";
+import helmet from "helmet";
+import { rateLimit } from "express-rate-limit";
 import { globalErrorHandler } from "../../Middleware/errorHandler.middleware.js";
 import { authRouter } from "../../Modules/Auth/auth.controller.js";
 import { userRouter } from "../../Modules/User/profile.controller.js";
 import { postsRouter } from "../../Modules/Posts/posts.controller.js";
-import { reactionRouter } from "../../Modules/Reactions/reaction.cotnroller.js";
+import { reactionRouter } from "../../Modules/Reactions/reaction.controller.js";
 import { commentsRouter } from "../../Modules/Comments/comments.controller.js";
-import { rateLimit } from "express-rate-limit";
 
 const allowedOrigins = process.env.ORIGIN_WHITE_LIST || [];
 const corsOptions = {
@@ -43,6 +44,7 @@ const limiter = rateLimit({
 export default function routerHandler(app, express) {
   app.use(cors(corsOptions));
   app.use(limiter);
+  app.use(helmet());
   app.use(express.json());
   app.use("/Assets", express.static("Assets"));
   app.use("/api/v1/auth", authRouter);
