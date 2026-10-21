@@ -4,12 +4,14 @@ import {
   findOne,
   findOneAndUpdate,
 } from "../../../DB/dbServices.js";
+import Comment from "../../../DB/Models/comment.model.js";
 import Post from "../../../DB/Models/Post.model.js";
 import Reaction from "../../../DB/Models/Reaction.model.js";
 import { sendSuccessResponse } from "../../../Utils/response/ApiResponse.js";
 
 const targetModels = {
   Post: Post,
+  Comment : Comment
 };
 
 export const react = async (req, res) => {

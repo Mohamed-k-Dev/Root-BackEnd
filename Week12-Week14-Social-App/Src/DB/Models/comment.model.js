@@ -29,7 +29,7 @@ export const commentSchema = new mongoose.Schema(
     post: { type: mongoose.Schema.Types.ObjectId, ref: "Post", required: true },
     ancestors: [{ type: mongoose.Schema.Types.ObjectId, ref: "Comment" }],
     repliesCount: { type: Number, default: 0 },
-    commentReactionsCount: { type: Number, default: 0 },
+    likesCount: { type: Number, default: 0 },
   },
   { timestamps: true }
 );

@@ -69,6 +69,7 @@ export const paginate = async ({
 
   const totalPages = Math.ceil(totalItems / limit);
   return {
+    data,
     pagination: {
       totalItems,
       totalPages,
@@ -77,7 +78,6 @@ export const paginate = async ({
       hasNextPage: page < totalPages,
       hasPrevPage: page > 1,
     },
-    data,
   };
 };
 

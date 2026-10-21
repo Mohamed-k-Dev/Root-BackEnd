@@ -5,6 +5,7 @@ import { userRouter } from "../../Modules/User/profile.controller.js";
 import { postsRouter } from "../../Modules/Posts/posts.controller.js";
 import { reactionRouter } from "../../Modules/Reactions/reaction.cotnroller.js";
 import { commentsRouter } from "../../Modules/Comments/comments.controller.js";
+import { rateLimit } from "express-rate-limit";
 
 const allowedOrigins = process.env.ORIGIN_WHITE_LIST || [];
 const corsOptions = {
@@ -27,8 +28,21 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization", "refreshToken"],
 };
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 100,
+  standardHeaders: "draft-8",
+  legacyHeaders: false,
+  message: {
+    success: false,
+    message:
+      "Too many requests from this IP, please try again after 15 minutes",
+  },
+});
+
 export default function routerHandler(app, express) {
   app.use(cors(corsOptions));
+  app.use(limiter);
   app.use(express.json());
   app.use("/Assets", express.static("Assets"));
   app.use("/api/v1/auth", authRouter);
